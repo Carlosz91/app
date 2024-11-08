@@ -1,0 +1,193 @@
+/* styles.css */
+
+/* Estilo base */
+body {
+    background-color: #f8f9fa; /* Color de fondo suave */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fuente moderna */
+    color: #343a40; /* Color de texto oscuro */
+    margin: 0;
+    padding: 0;
+}
+
+/* Estilos del contenedor principal */
+.container {
+    max-width: 800px; /* Limitar ancho */
+    margin: auto; /* Centrar contenedor */
+    padding: 20px; /* Espaciado interno */
+    background-color: #ffffff; /* Fondo blanco */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    border-radius: 8px; /* Bordes redondeados */
+}
+
+/* Estilo para títulos */
+h1, h2 {
+    color: #007bff; /* Color azul para títulos */
+    text-align: center; /* Centrar texto */
+}
+
+/* Estilos de formularios */
+.form-control {
+    border-radius: 4px; /* Bordes redondeados para campos */
+}
+
+.btn {
+    border-radius: 4px; /* Bordes redondeados para botones */
+    font-weight: bold; /* Botones en negrita */
+    padding: 10px 15px; /* Espaciado interno de botones */
+}
+
+/* Botones personalizados */
+.btn-primary {
+    background-color: #007bff; /* Color de fondo azul */
+    border-color: #007bff; /* Bordes del botón */
+}
+
+.btn-primary:hover {
+    background-color: #0056b3; /* Color más oscuro al pasar el ratón */
+}
+
+.btn-success {
+    background-color: #28a745; /* Verde para botones de éxito */
+    border-color: #28a745;
+}
+
+.btn-info {
+    background-color: #17a2b8; /* Azul claro */
+    border-color: #17a2b8;
+}
+
+.btn-warning {
+    background-color: #ffc107; /* Amarillo */
+    border-color: #ffc107;
+}
+
+.btn-danger {
+    background-color: #dc3545; /* Rojo */
+    border-color: #dc3545;
+}
+
+/* Alertas */
+.alert {
+    border-radius: 4px; /* Bordes redondeados para alertas */
+}
+
+/* Estilo de tablas */
+.table {
+    width: 100%; /* Ancho completo */
+    margin-bottom: 1rem; /* Espaciado inferior */
+    color: #212529; /* Color del texto en tablas */
+}
+
+.table thead th {
+    background-color: #007bff; /* Fondo azul en encabezados */
+    color: white; /* Texto blanco en encabezados */
+}
+
+.table tbody tr:hover {
+    background-color: #f1f1f1; /* Fondo gris al pasar el ratón */
+}
+
+/* Espaciado adicional */
+.mt-3 {
+    margin-top: 1rem !important; /* Espacio adicional en margenes */
+}
+
+.mt-4 {
+    margin-top: 2rem !important;
+}
+
+.mb-3 {
+    margin-bottom: 1rem !important;
+}
+
+/* Enlaces */
+a {
+    color: #007bff; /* Color azul */
+}
+
+a:hover {
+    color: #0056b3; /* Color azul más oscuro al pasar el ratón */
+}
+
+/* Estilo para listas de menús */
+.menu-list {
+    list-style: none; /* Quitar puntos de la lista */
+    padding: 0; /* Sin padding */
+    margin: 0; /* Sin margenes */
+}
+
+.menu-list li {
+    background-color: #e9ecef; /* Fondo gris claro para cada elemento de la lista */
+    margin: 10px 0; /* Margen entre elementos */
+    padding: 15px; /* Espaciado interno */
+    border-radius: 8px; /* Bordes redondeados */
+    transition: background-color 0.3s; /* Transición suave */
+}
+
+.menu-list li:hover {
+    background-color: #007bff; /* Cambia el color al pasar el ratón */
+}
+
+.menu-item {
+    text-decoration: none; /* Sin subrayado en enlaces */
+    color: #343a40; /* Color del texto */
+    font-weight: bold; /* Texto en negrita */
+    display: block; /* Hacer que el enlace ocupe toda la área del elemento */
+}
+
+/* Mejora de los botones */
+.btn {
+    display: inline-block; /* Botones en línea */
+    margin-top: 20px; /* Margen superior */
+}
+
+/* Espaciado adicional */
+.mt-3 {
+    margin-top: 1rem !important;
+}
+
+.mt-4 {
+    margin-top: 2rem !important;
+}
+body {
+    background-color: #f8f9fa; /* Fondo claro */
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: #343a40; /* Color del encabezado */
+}
+
+.container {
+    margin-top: 50px; /* Margen superior para centrar verticalmente */
+    padding: 30px;
+    border-radius: 10px; /* Bordes redondeados */
+    background-color: #ffffff; /* Fondo blanco para el contenedor */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); /* Sombra para efecto de profundidad */
+}
+
+.form-control {
+    border: 1px solid #ced4da; /* Borde estándar */
+    border-radius: 5px; /* Bordes redondeados en inputs */
+    transition: border-color 0.2s; /* Efecto de transición */
+}
+
+.form-control:focus {
+    border-color: #007bff; /* Color del borde al ha
+
+    /* static/styles.css */
+body {
+    background-color: #f8f9fa; /* Color de fondo suave */
+}
+
+.container {
+    margin-top: 50px;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #ffffff; /* Fondo blanco para el contenedor */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+h1 {
+    color: #007bff; /* Color para el título */
+}
