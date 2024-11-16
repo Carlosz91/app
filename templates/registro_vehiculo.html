@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Vehículo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            font-family: 'Poppins', sans-serif;
+            height: 100vh; /* Asegura que el fondo ocupe toda la pantalla */
+            display: flex;
+            align-items: center; /* Centra verticalmente */
+            justify-content: center; /* Centra horizontalmente */
+            margin: 0;
+        }
+        .container {
+            max-width: 600px; /* Mantiene un ancho máximo para el contenedor */
+            padding: 40px; /* Aumenta el relleno interno */
+            background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco con un poco de transparencia */
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            margin: 20px; /* Agrega margen exterior para separar del borde */
+        }
+        h1 {
+            margin-bottom: 30px; /* Aumenta el espacio debajo del título */
+            color: #0984e3;
+            font-weight: 600;
+        }
+        .welcome {
+            text-align: right;
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 20px; /* Espacio debajo del mensaje de bienvenida */
+        }
+        .welcome span {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #0984e3;
+        }
+        .form-group {
+            margin-bottom: 25px; /* Espacio entre los campos del formulario */
+        }
+        .btn {
+            margin-top: 10px; /* Espacio entre el botón y el formulario */
+        }
+        .alert {
+            margin-top: 15px; /* Espacio arriba de las alertas */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Bienvenida en la esquina superior -->
+    <div class="welcome">
+        <span>{{ usuario_nombre }}</span>
+    </div>
+
+    <div class="container">
+        <h1 class="text-center">Registrar Vehículo</h1>
+        <form action="{{ url_for('registro_vehiculo') }}" method="POST" class="mt-4">
+            <div class="form-group">
+                <label for="modelo">Modelo:</label>
+                <input type="text" name="modelo" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="chapa">Chapa:</label>
+                <input type="text" name="chapa" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="tipo_lavado">Tipo de Lavado:</label>
+                <select name="tipo_lavado" class="form-control" required>
+                    <option value="">Seleccione un tipo de lavado</option>
+                    <option value="ducha y aspirado">Ducha y Aspirado (35,000)</option>
+                    <option value="lavado completo">Lavado Completo (50,000)</option>
+                </select>
+            </div>
+            <input type="hidden" name="usuario_id" value="{{ usuario_id }}">
+            <button type="submit" class="btn btn-primary btn-block">Registrar Vehículo</button>
+        </form>
+        <a href="{{ url_for('menu') }}" class="d-block text-center mt-3">Volver al Menú</a>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-info">
+                    <ul>
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Lavados - Admin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        h1 {
+            color: #0984e3;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2rem;
+        }
+
+        .btn-back {
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+        }
+
+        .table th {
+            background-color: #f8f9fa; /* Fondo gris claro para encabezados */
+            color: #343a40; /* Color del texto de encabezados */
+        }
+
+        .table td {
+            vertical-align: middle; /* Alinear verticalmente el contenido de las celdas */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Reporte de Lavados</h1>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Modelo de Vehículo</th>
+                        <th>Tipo de Lavado</th>
+                        <th>Estado</th>
+                        <th>Hora de Lavado</th>
+                        <th>Hora de Finalización</th>
+                        <th>Precio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lavado in lavados %}
+                    <tr>
+                        <td>{{ lavado.id }}</td>
+                        <td>{{ lavado.modelo }}</td>
+                        <td>{{ lavado.tipo_lavado }}</td>
+                        <td>{{ lavado.estado }}</td>
+                        <td>{{ lavado.hora }}</td>
+                        <td>{{ lavado.hora_finalizacion or 'N/A' }}</td>
+                        <td>${{ lavado.precio }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">No hay lavados registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <a href="{{ url_for('menu') }}" class="btn btn-primary btn-back">Volver al Menú</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
