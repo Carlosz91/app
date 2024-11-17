@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.secret_key = "supersecretkey"  # Cambia esto en producción
 
 # Configuración de la base de datos SQLite
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///lavado.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///lavado.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
