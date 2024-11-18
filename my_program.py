@@ -148,9 +148,10 @@ def estado_lavado():
 @app.route('/finalizar_vehiculo/<int:id>', methods=['POST'])
 @login_requerido
 def finalizar_vehiculo(id):
+    # Obtener el vehículo desde la base de datos
     vehiculo = Vehiculo.query.get(id)
     
-    # Verifica si el vehículo existe
+    # Verificar si el vehículo existe
     if not vehiculo:
         flash("Vehículo no encontrado.")
         return redirect(url_for('estado_lavado'))
@@ -161,7 +162,10 @@ def finalizar_vehiculo(id):
         vehiculo.estado = 'Finalizado'
         
         # Obtener la hora de finalización como una cadena en formato HH:MM
-        hora_finalizacion_obj = datetime.now().strftime("%H:%M")
+        # Si prefieres usar Time como tipo de columna en la base de datos:
+        hora_finalizacion_obj = datetime.now().strftime("%H:%M")  # Si es String(5)
+        # O si prefieres usar el tipo Time en la base de datos:
+        # hora_finalizacion_obj = datetime.now().time()  # Si es Time
         
         # Asignar la hora de finalización
         vehiculo.hora_finalizacion = hora_finalizacion_obj
@@ -174,6 +178,7 @@ def finalizar_vehiculo(id):
         flash("No tienes permiso para finalizar este vehículo.")
     
     return redirect(url_for('estado_lavado'))
+
 
 @app.route('/pagos')
 @login_requerido
