@@ -4,7 +4,7 @@ from datetime import datetime
 import hashlib
 from functools import wraps
 import os
-from flask_migrate import Migrate
+
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"  # Cambia esto en producción
