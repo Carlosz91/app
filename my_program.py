@@ -1,27 +1,29 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import hashlib
 from functools import wraps
-import bcrypt
 import os
 
-app = Flask(__name__)
-app.secret_key = "supersecretkey"  # Cambiar esto en producción
 
-# Configuración de la base de datos PostgreSQL
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://lavado_1bwn_user:ivaJCbDZ42Zyuh923g6tx8KenVFDlR2I@dpg-cstjrul6l47c73elu51g-a/lavado_1bwn'
+app = Flask(__name__)
+app.secret_key = "supersecretkey"  # Cambia esto en producción
+
+# Configuración de la base de datos SQLite
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://lavado_user:<password>@dpg-cst3kui3esus739sdhu0-a:5432/lavado'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# Modelos
+# Modelo para Usuarios
 class Usuario(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(128), nullable=False)
-    correo = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(128), nullable=False)  # Aumentar longitud para bcrypt
+    correo = db.Column(db.String(120), nullable=False)
     ciudad = db.Column(db.String(50), nullable=False)
-    es_admin = db.Column(db.Boolean, default=False)
+    es_admin = db.Column(db.Boolean, default=False)  # Campo para verificar si es administrador
 
+# Modelo para Vehículos
 class Vehiculo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     modelo = db.Column(db.String(50), nullable=False)
@@ -29,19 +31,19 @@ class Vehiculo(db.Model):
     tipo_lavado = db.Column(db.String(50), nullable=False)
     estado = db.Column(db.String(20), default="En Curso")
     precio = db.Column(db.Integer, nullable=False)
-    hora = db.Column(db.DateTime, default=datetime.now)
-    hora_finalizacion = db.Column(db.DateTime)
-    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False, index=True)
-    usuario = db.relationship('Usuario', backref=db.backref('vehiculos', lazy='dynamic'))
+    hora = db.Column(db.String(5), default=datetime.now().strftime("%H:%M"))
+    hora_finalizacion = db.Column(db.String(5))  # Nueva columna para la hora de finalización
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+    usuario = db.relationship('Usuario', backref=db.backref('vehiculos', lazy=True))
 
-# Utilidades de seguridad
+
+
+
+# Función para hashear contraseñas
 def hashear_contrasena(contrasena):
-    return bcrypt.hashpw(contrasena.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    return hashlib.sha256(contrasena.encode()).hexdigest()
 
-def verificar_contrasena(contrasena, hashed):
-    return bcrypt.checkpw(contrasena.encode('utf-8'), hashed.encode('utf-8'))
-
-# Decoradores
+# Decorador para proteger rutas
 def login_requerido(f):
     @wraps(f)
     def decorador(*args, **kwargs):
@@ -51,20 +53,6 @@ def login_requerido(f):
         return f(*args, **kwargs)
     return decorador
 
-def admin_requerido(f):
-    @wraps(f)
-    def decorador(*args, **kwargs):
-        if 'usuario_id' not in session or not is_admin(session['usuario_id']):
-            flash("No tienes permiso para acceder a esta página.")
-            return redirect(url_for('menu'))
-        return f(*args, **kwargs)
-    return decorador
-
-def is_admin(usuario_id):
-    usuario = Usuario.query.get(usuario_id)
-    return usuario.es_admin if usuario else False
-
-# Rutas
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -75,7 +63,7 @@ def iniciar_sesion():
     password = request.form['password']
     usuario_db = Usuario.query.filter_by(nombre=usuario).first()
 
-    if usuario_db and verificar_contrasena(password, usuario_db.password):
+    if usuario_db and usuario_db.password == hashear_contrasena(password):
         session['usuario_id'] = usuario_db.id
         flash("Inicio de sesión exitoso.")
         return redirect(url_for('menu'))
@@ -149,20 +137,57 @@ def registro_vehiculo():
 @app.route('/estado_lavado')
 @login_requerido
 def estado_lavado():
-    admin = is_admin(session['usuario_id'])
+    admin = is_admin(session['usuario_id'])  # Verifica si el usuario es admin
     if admin:
-        vehiculos = Vehiculo.query.all()
+        vehiculos_en_curso = Vehiculo.query.filter_by(estado='En Curso').all()
+        vehiculos_finalizados = Vehiculo.query.filter_by(estado='Finalizado').all()
     else:
         usuario_id = session['usuario_id']
-        vehiculos = Vehiculo.query.filter_by(usuario_id=usuario_id).all()
+        vehiculos_en_curso = Vehiculo.query.filter_by(estado='En Curso', usuario_id=usuario_id).all()
+        vehiculos_finalizados = Vehiculo.query.filter_by(estado='Finalizado', usuario_id=usuario_id).all()
     
-    return render_template('estado_lavado.html', vehiculos=vehiculos, es_admin=admin)
+    return render_template('estado_lavado.html', 
+                           vehiculos_en_curso=vehiculos_en_curso, 
+                           vehiculos_finalizados=vehiculos_finalizados,
+                           es_admin=admin)  # Pasa la variable es_admin a la plantilla
 
-@app.route('/admin/reportes', methods=['GET'])
-@admin_requerido
-def admin_reportes():
-    cantidad_vehiculos = Vehiculo.query.count()
-    return render_template('admin_reportes.html', cantidad_vehiculos=cantidad_vehiculos)
+@app.route('/finalizar_vehiculo/<int:id>', methods=['POST'])
+@login_requerido
+def finalizar_vehiculo(id):
+    vehiculo = Vehiculo.query.get(id)
+
+    # Verifica si el vehículo existe
+    if not vehiculo:
+        flash("Vehículo no encontrado.")
+        return redirect(url_for('estado_lavado'))
+
+    # Permitir que un administrador finalice el vehículo, o un usuario normal solo si es su vehículo
+    if vehiculo.usuario_id == session['usuario_id'] or is_admin(session['usuario_id']):
+        vehiculo.estado = 'Finalizado'
+        vehiculo.hora_finalizacion = datetime.now().strftime("%H:%M")  # Establece la hora de finalización
+        db.session.commit()
+        flash("Vehículo finalizado con éxito.")
+    else:
+        flash("No tienes permiso para finalizar este vehículo.")
+    
+    return redirect(url_for('estado_lavado'))
+
+@app.route('/pagos')
+@login_requerido
+def pagos():
+    return render_template('pagos.html')
+
+@app.route('/olvide_contrasena', methods=['GET', 'POST'])
+def olvide_contrasena():
+    if request.method == 'POST':
+        correo = request.form['correo']
+        usuario = Usuario.query.filter_by(correo=correo).first()
+        if usuario:
+            flash(f"Instrucciones enviadas a {correo} (simulado).")
+            return redirect(url_for('index'))
+        else:
+            flash("Correo no encontrado.")
+    return render_template('olvide_contrasena.html')
 
 @app.route('/cerrar_sesion')
 def cerrar_sesion():
@@ -170,9 +195,77 @@ def cerrar_sesion():
     flash("Sesión cerrada.")
     return redirect(url_for('index'))
 
-# Inicialización
+# Rutas de administración
+def is_admin(usuario_id):
+    usuario = Usuario.query.get(usuario_id)
+    return usuario.es_admin if usuario else False
+
+@app.route('/admin/vehiculos', methods=['GET'])
+@login_requerido
+def admin_vehiculos():
+    if not is_admin(session['usuario_id']):
+        flash("No tienes permiso para acceder a esta página.")
+        return redirect(url_for('menu'))
+    
+    vehiculos = Vehiculo.query.all()  # Obtener todos los vehículos registrados
+    return render_template('admin_vehiculos.html', vehiculos=vehiculos)
+
+@app.route('/admin/pagos', methods=['GET'])
+@login_requerido
+def admin_pagos():
+    if not is_admin(session['usuario_id']):
+        flash("No tienes permiso para acceder a esta página.")
+        return redirect(url_for('menu'))
+    
+    # Obtener solo los datos necesarios de cada vehículo
+    pagos = Vehiculo.query.with_entities(Vehiculo.id, Vehiculo.tipo_lavado, Vehiculo.precio, Vehiculo.chapa).all()
+    
+    return render_template('admin_pagos.html', pagos=pagos)
+
+
+@app.route('/admin/reportes', methods=['GET'])
+@login_requerido
+def admin_reportes():
+    if not is_admin(session['usuario_id']):
+        flash("No tienes permiso para acceder a esta página.")
+        return redirect(url_for('menu'))
+    
+    # Aquí puedes agregar la lógica para ver reportes de vehículos
+    cantidad_vehiculos = Vehiculo.query.count()
+    return render_template('admin_reportes.html', cantidad_vehiculos=cantidad_vehiculos)
+
+
+
+
+
+@app.route('/admin/reportes/lavados', methods=['GET'])
+@login_requerido
+def admin_reportes_lavados():
+    if not is_admin(session['usuario_id']):
+        flash("No tienes permiso para acceder a esta página.")
+        return redirect(url_for('menu'))
+    
+    # Cambia esto para obtener objetos Vehiculo
+    lavados = Vehiculo.query.all()  
+    
+    # Verificar la cantidad de lavados obtenidos
+    print(f"Número de lavados: {len(lavados)}")  # Debes ver un número mayor a 0 si hay registros
+
+    return render_template('admin_reportes_lavados.html', lavados=lavados)
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
+    port = int(os.environ.get('PORT', 5000))  # Si Render asigna un puerto dinámico
+    app.run(host='0.0.0.0', port=port, debug=True)
+
+
+
+
+
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()  # Crea todas las tablas si no existen
+    app.run(debug=True)
 
