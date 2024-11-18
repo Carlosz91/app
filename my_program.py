@@ -141,15 +141,27 @@ def estado_lavado():
 @login_requerido
 def finalizar_vehiculo(id):
     vehiculo = Vehiculo.query.get(id)
+    
     # Verifica si el vehículo existe
     if not vehiculo:
         flash("Vehículo no encontrado.")
         return redirect(url_for('estado_lavado'))
+
     # Permitir que un administrador finalice el vehículo, o un usuario normal solo si es su vehículo
     if vehiculo.usuario_id == session['usuario_id'] or is_admin(session['usuario_id']):
+        # Cambiar el estado a 'Finalizado'
         vehiculo.estado = 'Finalizado'
-        vehiculo.hora_finalizacion = datetime.now().strftime("%H:%M")  # Establece la hora de finalización
+        
+        # Convertir la hora actual a un objeto `time`
+        hora_finalizacion_obj = datetime.now().strftime("%H:%M")
+        hora_finalizacion_obj = datetime.strptime(hora_finalizacion_obj, "%H:%M").time()
+        
+        # Asignar la hora de finalización
+        vehiculo.hora_finalizacion = hora_finalizacion_obj
+        
+        # Guardar los cambios en la base de datos
         db.session.commit()
+        
         flash("Vehículo finalizado con éxito.")
     else:
         flash("No tienes permiso para finalizar este vehículo.")
