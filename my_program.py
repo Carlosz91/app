@@ -35,7 +35,7 @@ class Vehiculo(db.Model):
     estado = db.Column(db.String(20), default="En Curso")
     precio = db.Column(db.Integer, nullable=False)
     hora = db.Column(db.String(5), default=datetime.now().strftime("%H:%M"))  # Hora como cadena HH:MM
-    hora_finalizacion = db.Column(db.String(5))  # Nueva columna para hora de finalización
+    hora_finalizacion = datetime.combine(datetime.today(), hora_finalizacion_time)
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     usuario = db.relationship('Usuario', backref=db.backref('vehiculos', lazy=True))
 
