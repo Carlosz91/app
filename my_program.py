@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.secret_key = "supersecretkey"  # Cambia esto en producción
 
 # Configuración de la base de datos SQLite
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://lavado_user:<password>@dpg-cst3kui3esus739sdhu0-a:5432/lavado'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///lavado.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -268,4 +268,5 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Crea todas las tablas si no existen
     app.run(debug=True)
+
 
