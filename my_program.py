@@ -232,8 +232,10 @@ def admin_reportes():
         flash("No tienes permiso para acceder a esta página.")
         return redirect(url_for('menu'))
     
-    # Aquí puedes agregar lógica para generar y mostrar reportes
-    return render_template('admin_reportes.html')
+    # Generar reportes según los criterios que necesites
+    vehiculos = Vehiculo.query.all()  # Obtener todos los vehículos
+    return render_template('admin_reportes.html', vehiculos=vehiculos)
 
-if __name__ == "__main__":
+# Ejecutar la app
+if __name__ == '__main__':
     app.run(debug=True)
