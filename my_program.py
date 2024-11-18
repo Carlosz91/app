@@ -30,8 +30,8 @@ class Vehiculo(db.Model):
     tipo_lavado = db.Column(db.String(50), nullable=False)
     estado = db.Column(db.String(20), default="En Curso")
     precio = db.Column(db.Integer, nullable=False)
-    hora = db.Column(db.Time, default=datetime.now().time())  # Cambiar a tipo TIME
-    hora_finalizacion = db.Column(db.Time)  # Cambiar a tipo TIME
+    hora = db.Column(db.DateTime, default=datetime.now)  # Cambiar a DateTime
+    hora_finalizacion = db.Column(db.DateTime)  # También DateTime
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     usuario = db.relationship('Usuario', backref=db.backref('vehiculos', lazy=True))
 
@@ -117,7 +117,7 @@ def registro_vehiculo():
             tipo_lavado=tipo_lavado,
             precio=precio,
             usuario_id=usuario_id,
-            hora=datetime.now().time()
+            hora=datetime.now()
         )
         db.session.add(nuevo_vehiculo)
         db.session.commit()
