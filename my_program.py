@@ -35,7 +35,7 @@ class Vehiculo(db.Model):
     estado = db.Column(db.String(20), default="En Curso")
     precio = db.Column(db.Integer, nullable=False)
     hora = db.Column(db.String(5), default=datetime.now().strftime("%H:%M"))  # Hora como cadena HH:MM
-    hora_finalizacion = datetime.combine(datetime.today(), hora_finalizacion_time)
+    hora_finalizacion = db.Column(db.DateTime, nullable=True)  # Use DateTime for finalization time
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     usuario = db.relationship('Usuario', backref=db.backref('vehiculos', lazy=True))
 
@@ -148,29 +148,18 @@ def estado_lavado():
 @app.route('/finalizar_vehiculo/<int:id>', methods=['POST'])
 @login_requerido
 def finalizar_vehiculo(id):
-    # Obtener el vehículo desde la base de datos
     vehiculo = Vehiculo.query.get(id)
     
-    # Verificar si el vehículo existe
     if not vehiculo:
         flash("Vehículo no encontrado.")
         return redirect(url_for('estado_lavado'))
 
-    # Permitir que un administrador finalice el vehículo, o un usuario normal solo si es su vehículo
     if vehiculo.usuario_id == session['usuario_id'] or is_admin(session['usuario_id']):
-        # Cambiar el estado a 'Finalizado'
         vehiculo.estado = 'Finalizado'
         
-        # Obtener la hora de finalización como una cadena en formato HH:MM
-        # Si prefieres usar Time como tipo de columna en la base de datos:
-        hora_finalizacion_obj = datetime.now()
-        # O si prefieres usar el tipo Time en la base de datos:
-        # hora_finalizacion_obj = datetime.now().time()  # Si es Time
-        
-        # Asignar la hora de finalización
-        vehiculo.hora_finalizacion = hora_finalizacion_obj
-        
-        # Guardar los cambios en la base de datos
+        # Set finalization time to current time
+        vehiculo.hora_finalizacion = datetime.now()
+
         db.session.commit()
         
         flash("Vehículo finalizado con éxito.")
@@ -178,6 +167,7 @@ def finalizar_vehiculo(id):
         flash("No tienes permiso para finalizar este vehículo.")
     
     return redirect(url_for('estado_lavado'))
+
 
 
 @app.route('/pagos')
