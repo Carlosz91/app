@@ -163,7 +163,7 @@ def finalizar_vehiculo(id):
         
         # Obtener la hora de finalización como una cadena en formato HH:MM
         # Si prefieres usar Time como tipo de columna en la base de datos:
-        hora_finalizacion_obj = datetime.now().strftime("%H:%M")  # Si es String(5)
+        hora_finalizacion_obj = datetime.now()
         # O si prefieres usar el tipo Time en la base de datos:
         # hora_finalizacion_obj = datetime.now().time()  # Si es Time
         
