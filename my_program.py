@@ -150,17 +150,22 @@ def finalizar_vehiculo(id):
     if not vehiculo:
         flash("Vehículo no encontrado.")
         return redirect(url_for('estado_lavado'))
+    
     # Permitir que un administrador finalice el vehículo, o un usuario normal solo si es su vehículo
     if vehiculo.usuario_id == session['usuario_id'] or is_admin(session['usuario_id']):
         vehiculo.estado = 'Finalizado'
-        hora_finalizacion = datetime.combine(date.today(), hora_actual)
+        
+        # Obtener la hora actual correctamente
+        hora_actual = datetime.now().time()
+        vehiculo.hora_finalizacion = datetime.combine(date.today(), hora_actual)
+        
         db.session.commit()
         flash("Vehículo finalizado con éxito.")
     else:
         flash("No tienes permiso para finalizar este vehículo.")
     
     return redirect(url_for('estado_lavado'))
-
+    
 @app.route('/pagos')
 @login_requerido
 def pagos():
