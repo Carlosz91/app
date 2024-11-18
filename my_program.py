@@ -22,39 +22,6 @@ class Usuario(db.Model):
     es_admin = db.Column(db.Boolean, default=False)  # Campo para verificar si es administrador
 
 
-# Función de inicialización que se ejecuta al inicio
-def crear_usuario_admin():
-    nombre_admin = 'admin'
-    password_admin = 'admin123'
-    correo_admin = 'admin@example.com'
-    ciudad_admin = 'Tu Ciudad'
-    
-    # Verificar si el usuario admin ya existe
-    usuario_existente = Usuario.query.filter_by(nombre=nombre_admin).first()
-    if not usuario_existente:
-        nuevo_admin = Usuario(
-            nombre=nombre_admin,
-            password=generate_password_hash(password_admin),
-            correo=correo_admin,
-            ciudad=ciudad_admin,
-            es_admin=True
-        )
-        db.session.add(nuevo_admin)
-        db.session.commit()
-        print(f"Usuario administrador '{nombre_admin}' creado con éxito.")
-    else:
-        print("El usuario administrador ya existe.")
-
-# Ejecutar la función de creación del admin antes de iniciar la aplicación
-@app.before_first_request
-def before_first_request():
-    db.create_all()  # Crea las tablas si no existen
-    crear_usuario_admin()  # Crear el administrador
-
-# Ruta de inicio de la aplicación
-@app.route('/')
-def home():
-    return "Aplicación funcionando"
 
 
 
