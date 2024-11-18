@@ -153,7 +153,7 @@ def finalizar_vehiculo(id):
     # Permitir que un administrador finalice el vehículo, o un usuario normal solo si es su vehículo
     if vehiculo.usuario_id == session['usuario_id'] or is_admin(session['usuario_id']):
         vehiculo.estado = 'Finalizado'
-        vehiculo.hora_finalizacion = datetime.now().time()
+        hora_finalizacion = datetime.combine(date.today(), hora_actual)
         db.session.commit()
         flash("Vehículo finalizado con éxito.")
     else:
