@@ -36,14 +36,18 @@ class Vehiculo(db.Model):
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     usuario = db.relationship('Usuario', backref=db.backref('vehiculos', lazy=True))
 
-# Función para hashear contraseñas con bcrypt
+# Función para hashear la contraseña
 def hashear_contrasena(contrasena):
-    salt = bcrypt.gensalt()
-    return bcrypt.hashpw(contrasena.encode(), salt)
+    salt = bcrypt.gensalt()  # Genera un salt
+    return bcrypt.hashpw(contrasena.encode(), salt)  # Devuelve el hash como bytes
 
 # Función para verificar la contraseña
 def verificar_contrasena(contrasena, hash_contrasena):
-    return bcrypt.checkpw(contrasena.encode(), hash_contrasena)
+    # Asegúrate de que hash_contrasena sea de tipo bytes
+    if isinstance(hash_contrasena, str):
+        hash_contrasena = hash_contrasena.encode()  # Convertir a bytes si es una cadena
+    
+    return bcrypt.checkpw(contrasena.encode(), hash_contrasena)  # Comparar la contraseña con el hash
 
 # Decorador para proteger rutas
 def login_requerido(f):
