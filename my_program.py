@@ -10,6 +10,8 @@ app.secret_key = "supersecretkey"  # Cambia esto en producción
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://lavado_1bwn_user:ivaJCbDZ42Zyuh923g6tx8KenVFDlR2I@dpg-cstjrul6l47c73elu51g-a/lavado_1bwn'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+
 # Modelo para Usuarios
 class Usuario(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -18,6 +20,52 @@ class Usuario(db.Model):
     correo = db.Column(db.String(120), nullable=False)
     ciudad = db.Column(db.String(50), nullable=False)
     es_admin = db.Column(db.Boolean, default=False)  # Campo para verificar si es administrador
+
+# Modelo Usuario
+class Usuario(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    correo = db.Column(db.String(100), nullable=False)
+    ciudad = db.Column(db.String(100), nullable=False)
+    es_admin = db.Column(db.Boolean, default=False)
+
+# Función de inicialización que se ejecuta al inicio
+def crear_usuario_admin():
+    nombre_admin = 'admin'
+    password_admin = 'admin123'
+    correo_admin = 'admin@example.com'
+    ciudad_admin = 'Tu Ciudad'
+    
+    # Verificar si el usuario admin ya existe
+    usuario_existente = Usuario.query.filter_by(nombre=nombre_admin).first()
+    if not usuario_existente:
+        nuevo_admin = Usuario(
+            nombre=nombre_admin,
+            password=generate_password_hash(password_admin),
+            correo=correo_admin,
+            ciudad=ciudad_admin,
+            es_admin=True
+        )
+        db.session.add(nuevo_admin)
+        db.session.commit()
+        print(f"Usuario administrador '{nombre_admin}' creado con éxito.")
+    else:
+        print("El usuario administrador ya existe.")
+
+# Ejecutar la función de creación del admin antes de iniciar la aplicación
+@app.before_first_request
+def before_first_request():
+    db.create_all()  # Crea las tablas si no existen
+    crear_usuario_admin()  # Crear el administrador
+
+# Ruta de inicio de la aplicación
+@app.route('/')
+def home():
+    return "Aplicación funcionando"
+
+
+
 # Modelo para Vehículos
 class Vehiculo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
