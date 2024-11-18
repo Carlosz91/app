@@ -34,8 +34,8 @@ class Vehiculo(db.Model):
     tipo_lavado = db.Column(db.String(50), nullable=False)
     estado = db.Column(db.String(20), default="En Curso")
     precio = db.Column(db.Integer, nullable=False)
-    hora = db.Column(db.String(5), default=datetime.now().strftime("%H:%M"))  # Hora como cadena HH:MM
-    hora_finalizacion = db.Column(db.String(5))  # Nueva columna para hora de finalización
+    hora = db.Column(db.Time, default=datetime.now().time())  # Usando TIME
+    hora_finalizacion = db.Column(db.Time)  # Usando TIME
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     usuario = db.relationship('Usuario', backref=db.backref('vehiculos', lazy=True))
 
