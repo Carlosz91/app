@@ -4,9 +4,11 @@ from datetime import datetime
 import hashlib
 from functools import wraps
 import os
+
 app = Flask(__name__)
 app.secret_key = "supersecretkey"  # Cambia esto en producción
-# Configuración de la base de datos SQLite
+
+# Configuración de la base de datos PostgreSQL
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://lavado_1bwn_user:ivaJCbDZ42Zyuh923g6tx8KenVFDlR2I@dpg-cstjrul6l47c73elu51g-a/lavado_1bwn'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -21,7 +23,6 @@ class Usuario(db.Model):
     es_admin = db.Column(db.Boolean, default=False)  # Campo para verificar si es administrador
 
 # Modelo para Vehículos
-# Modelo para Vehículos
 class Vehiculo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     modelo = db.Column(db.String(50), nullable=False)
@@ -33,7 +34,6 @@ class Vehiculo(db.Model):
     hora_finalizacion = db.Column(db.Time)  # Cambiar a tipo TIME
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     usuario = db.relationship('Usuario', backref=db.backref('vehiculos', lazy=True))
-
 
 # Función para hashear contraseñas
 def hashear_contrasena(contrasena):
@@ -65,7 +65,7 @@ def iniciar_sesion():
     else:
         flash("Usuario o contraseña incorrecta.")
         return redirect(url_for('index'))
-    
+
 @app.route('/registrar', methods=['GET', 'POST'])
 def registrar():
     if request.method == 'POST':
@@ -116,7 +116,7 @@ def registro_vehiculo():
             chapa=chapa,
             tipo_lavado=tipo_lavado,
             precio=precio,
-            usuario_id=usuario_id
+            usuario_id=usuario_id,
             hora=datetime.now().time()
         )
         db.session.add(nuevo_vehiculo)
@@ -183,6 +183,7 @@ def cerrar_sesion():
     session.pop('usuario_id', None)
     flash("Sesión cerrada.")
     return redirect(url_for('index'))
+
 # Rutas de administración
 def is_admin(usuario_id):
     usuario = Usuario.query.get(usuario_id)
@@ -205,7 +206,6 @@ def admin_pagos():
         flash("No tienes permiso para acceder a esta página.")
         return redirect(url_for('menu'))
     
-    # Obtener solo los datos necesarios de cada vehículo
     pagos = Vehiculo.query.with_entities(Vehiculo.id, Vehiculo.tipo_lavado, Vehiculo.precio, Vehiculo.chapa).all()
     
     return render_template('admin_pagos.html', pagos=pagos)
@@ -217,7 +217,6 @@ def admin_reportes():
         flash("No tienes permiso para acceder a esta página.")
         return redirect(url_for('menu'))
     
-    # Aquí puedes agregar la lógica para ver reportes de vehículos
     cantidad_vehiculos = Vehiculo.query.count()
     return render_template('admin_reportes.html', cantidad_vehiculos=cantidad_vehiculos)
 
@@ -228,22 +227,13 @@ def admin_reportes_lavados():
         flash("No tienes permiso para acceder a esta página.")
         return redirect(url_for('menu'))
     
-    # Cambia esto para obtener objetos Vehiculo
     lavados = Vehiculo.query.all()  
     
-    # Verificar la cantidad de lavados obtenidos
-    print(f"Número de lavados: {len(lavados)}")  # Debes ver un número mayor a 0 si hay registros
+    print(f"Número de lavados: {len(lavados)}")  # Verifica los registros
     return render_template('admin_reportes_lavados.html', lavados=lavados)
-
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     port = int(os.environ.get('PORT', 5000))  # Si Render asigna un puerto dinámico
     app.run(host='0.0.0.0', port=port, debug=True)
-
-
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()  # Crea todas las tablas si no existen
-    app.run(debug=True)
