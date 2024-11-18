@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-import bcrypt
+import hashlib
 from functools import wraps
 import os
 
@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.secret_key = "supersecretkey"  # Cambia esto en producción
 
 # Configuración de la base de datos SQLite
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://lavado_1bwn_user:ivaJCbDZ42Zyuh923g6tx8KenVFDlR2I@dpg-cstjrul6l47c73elu51g-a/lavado_1bwn')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://lavado_1bwn_user:ivaJCbDZ42Zyuh923g6tx8KenVFDlR2I@dpg-cstjrul6l47c73elu51g-a/lavado_1bwn')'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -36,18 +36,12 @@ class Vehiculo(db.Model):
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     usuario = db.relationship('Usuario', backref=db.backref('vehiculos', lazy=True))
 
-# Función para hashear la contraseña
-def hashear_contrasena(contrasena):
-    salt = bcrypt.gensalt()  # Genera un salt
-    return bcrypt.hashpw(contrasena.encode(), salt)  # Devuelve el hash como bytes
 
-# Función para verificar la contraseña
-def verificar_contrasena(contrasena, hash_contrasena):
-    # Asegúrate de que hash_contrasena sea de tipo bytes
-    if isinstance(hash_contrasena, str):
-        hash_contrasena = hash_contrasena.encode()  # Convertir a bytes si es una cadena
-    
-    return bcrypt.checkpw(contrasena.encode(), hash_contrasena)  # Comparar la contraseña con el hash
+
+
+# Función para hashear contraseñas
+def hashear_contrasena(contrasena):
+    return hashlib.sha256(contrasena.encode()).hexdigest()
 
 # Decorador para proteger rutas
 def login_requerido(f):
@@ -69,7 +63,7 @@ def iniciar_sesion():
     password = request.form['password']
     usuario_db = Usuario.query.filter_by(nombre=usuario).first()
 
-    if usuario_db and verificar_contrasena(password, usuario_db.password):
+    if usuario_db and usuario_db.password == hashear_contrasena(password):
         session['usuario_id'] = usuario_db.id
         flash("Inicio de sesión exitoso.")
         return redirect(url_for('menu'))
@@ -126,11 +120,6 @@ def registro_vehiculo():
             flash("Tipo de lavado no válido.")
             return redirect(url_for('registro_vehiculo'))
 
-        # Validación de chapa
-        if len(chapa) < 6:
-            flash("La chapa debe tener al menos 6 caracteres.")
-            return redirect(url_for('registro_vehiculo'))
-
         nuevo_vehiculo = Vehiculo(
             modelo=modelo,
             chapa=chapa,
@@ -160,7 +149,7 @@ def estado_lavado():
     return render_template('estado_lavado.html', 
                            vehiculos_en_curso=vehiculos_en_curso, 
                            vehiculos_finalizados=vehiculos_finalizados,
-                           es_admin=admin)
+                           es_admin=admin)  # Pasa la variable es_admin a la plantilla
 
 @app.route('/finalizar_vehiculo/<int:id>', methods=['POST'])
 @login_requerido
@@ -241,12 +230,43 @@ def admin_reportes():
         flash("No tienes permiso para acceder a esta página.")
         return redirect(url_for('menu'))
     
-    return render_template('admin_reportes.html')
+    # Aquí puedes agregar la lógica para ver reportes de vehículos
+    cantidad_vehiculos = Vehiculo.query.count()
+    return render_template('admin_reportes.html', cantidad_vehiculos=cantidad_vehiculos)
+
+
+
+
+
+@app.route('/admin/reportes/lavados', methods=['GET'])
+@login_requerido
+def admin_reportes_lavados():
+    if not is_admin(session['usuario_id']):
+        flash("No tienes permiso para acceder a esta página.")
+        return redirect(url_for('menu'))
+    
+    # Cambia esto para obtener objetos Vehiculo
+    lavados = Vehiculo.query.all()  
+    
+    # Verificar la cantidad de lavados obtenidos
+    print(f"Número de lavados: {len(lavados)}")  # Debes ver un número mayor a 0 si hay registros
+
+    return render_template('admin_reportes_lavados.html', lavados=lavados)
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+    port = int(os.environ.get('PORT', 5000))  # Si Render asigna un puerto dinámico
+    app.run(host='0.0.0.0', port=port, debug=True)
+
+
+
+
 
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Crea todas las tablas si no existen
-    port = int(os.environ.get('PORT', 5000))  # Si Render asigna un puerto dinámico
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(debug=True)
+
 
