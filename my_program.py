@@ -21,6 +21,7 @@ class Usuario(db.Model):
     es_admin = db.Column(db.Boolean, default=False)  # Campo para verificar si es administrador
 
 # Modelo para Vehículos
+# Modelo para Vehículos
 class Vehiculo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     modelo = db.Column(db.String(50), nullable=False)
@@ -28,10 +29,11 @@ class Vehiculo(db.Model):
     tipo_lavado = db.Column(db.String(50), nullable=False)
     estado = db.Column(db.String(20), default="En Curso")
     precio = db.Column(db.Integer, nullable=False)
-    hora = db.Column(db.String(5), default=datetime.now().strftime("%H:%M"))
-    hora_finalizacion = db.Column(db.String(5))  # Nueva columna para la hora de finalización
+    hora = db.Column(db.Time, default=datetime.now().time())  # Cambiar a tipo TIME
+    hora_finalizacion = db.Column(db.Time)  # Cambiar a tipo TIME
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     usuario = db.relationship('Usuario', backref=db.backref('vehiculos', lazy=True))
+
 
 # Función para hashear contraseñas
 def hashear_contrasena(contrasena):
@@ -115,6 +117,7 @@ def registro_vehiculo():
             tipo_lavado=tipo_lavado,
             precio=precio,
             usuario_id=usuario_id
+            hora=datetime.now().time()
         )
         db.session.add(nuevo_vehiculo)
         db.session.commit()
@@ -150,7 +153,7 @@ def finalizar_vehiculo(id):
     # Permitir que un administrador finalice el vehículo, o un usuario normal solo si es su vehículo
     if vehiculo.usuario_id == session['usuario_id'] or is_admin(session['usuario_id']):
         vehiculo.estado = 'Finalizado'
-        vehiculo.hora_finalizacion = datetime.now().strftime("%H:%M")  # Establece la hora de finalización
+        vehiculo.hora_finalizacion = datetime.now().time()
         db.session.commit()
         flash("Vehículo finalizado con éxito.")
     else:
