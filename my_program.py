@@ -158,7 +158,7 @@ def finalizar_vehiculo(id):
         vehiculo.estado = 'Finalizado'
         
         # Set finalization time to current time
-        vehiculo.hora_finalizacion = datetime.now()
+        hora_finalizacion = db.Column(db.DateTime, nullable=True)
 
         db.session.commit()
         
