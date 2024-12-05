@@ -13,6 +13,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://lavado_mwra_user:nWdArfx2g
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
+
 # Modelo para Usuarios
 class Usuario(db.Model):
     id = db.Column(db.Integer, primary_key=True)
