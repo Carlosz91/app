@@ -9,7 +9,7 @@ app = Flask(__name__)
 app.secret_key = "supersecretkey"  # Cambia esto en producción
 
 # Configuración de la base de datos PostgreSQL
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://lavado_1bwn_user:ivaJCbDZ42Zyuh923g6tx8KenVFDlR2I@dpg-cstjrul6l47c73elu51g-a/lavado_1bwn'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://lavado_mwra_user:nWdArfx2gwxmnrSpYTWttBR5tkWDxb6D@dpg-ct8qard2ng1s739pale0-a/lavado_mwra'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
