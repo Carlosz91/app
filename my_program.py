@@ -70,7 +70,7 @@ def iniciar_sesion():
 @app.route('/registrar', methods=['GET', 'POST'])
 def registrar():
     if request.method == 'POST':
-        nombre = request.form['usuario']
+        nombre = request.form['Usuario']
         password = request.form['password']
         correo = request.form['correo']
         ciudad = request.form['ciudad']
