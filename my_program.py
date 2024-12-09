@@ -166,11 +166,53 @@ def finalizar_vehiculo(id):
         flash("No tienes permiso para finalizar este vehículo.")
     
     return redirect(url_for('estado_lavado'))
-    
-@app.route('/pagos')
+@app.route('/pagos', methods=['GET', 'POST'])
 @login_requerido
 def pagos():
-    return render_template('pagos.html')
+    if request.method == 'POST':
+        # Procesar la información de pago
+        tipo_pago = request.form.get('tipo_pago')
+        vehiculo_id = request.form.get('vehiculo_id')
+
+        # Validar datos
+        if not tipo_pago or not vehiculo_id:
+            flash("Por favor completa todos los campos.")
+            return redirect(url_for('pagos'))
+
+        try:
+            # Buscar el vehículo
+            vehiculo = Vehiculo.query.get(vehiculo_id)
+            if vehiculo:
+                # Crear un nuevo registro de pago
+                nuevo_pago = Pago(
+                    vehiculo_id=vehiculo.id,
+                    tipo_lavado=vehiculo.tipo_lavado,
+                    precio=vehiculo.precio,
+                    chapa=vehiculo.chapa,
+                    tipo_pago=tipo_pago
+                )
+                db.session.add(nuevo_pago)
+                db.session.commit()
+                flash("Pago realizado correctamente.")
+            else:
+                flash("Vehículo no encontrado.")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Ocurrió un error al procesar el pago: {e}")
+
+        return redirect(url_for('pagos'))
+
+    # Si es un GET, mostrar la información de pagos y la vista
+    try:
+        pagos_realizados = Pago.query.all()
+        vehiculos = Vehiculo.query.all()
+    except Exception as e:
+        flash(f"No se pudo recuperar los datos: {e}")
+        pagos_realizados = []
+        vehiculos = []
+
+    return render_template('pagos.html', pagos=pagos_realizados, vehiculos=vehiculos)
+
 
 @app.route('/olvide_contrasena', methods=['GET', 'POST'])
 def olvide_contrasena():
