@@ -1,49 +1,23 @@
-@app.route('/pagos', methods=['GET', 'POST'])
-@login_requerido
-def pagos():
-    if request.method == 'POST':
-        # Procesar la información de pago
-        tipo_pago = request.form.get('tipo_pago')
-        vehiculo_id = request.form.get('vehiculo_id')
+<form action="{{ url_for('pagos') }}" method="POST">
+    <div class="mb-3">
+        <label for="vehiculo_id" class="form-label">Selecciona un vehículo:</label>
+        <select name="vehiculo_id" class="form-select" required>
+            <option value="">Seleccione un vehículo</option>
+            {% for vehiculo in vehiculos %}
+                <option value="{{ vehiculo.id }}">{{ vehiculo.modelo }} - {{ vehiculo.chapa }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    
+    <div class="mb-3">
+        <label for="tipo_pago" class="form-label">Tipo de pago:</label>
+        <select name="tipo_pago" class="form-select" required>
+            <option value="">Seleccione un tipo de pago</option>
+            <option value="tarjeta">Tarjeta de Crédito/Débito</option>
+            <option value="transferencia">Transferencia</option>
+        </select>
+    </div>
 
-        # Validar datos
-        if not tipo_pago or not vehiculo_id:
-            flash("Por favor completa todos los campos.")
-            return redirect(url_for('pagos'))
-
-        try:
-            # Buscar el vehículo
-            vehiculo = Vehiculo.query.get(vehiculo_id)
-            if vehiculo:
-                # Crear un nuevo registro de pago
-                nuevo_pago = Pago(
-                    vehiculo_id=vehiculo.id,
-                    tipo_lavado=vehiculo.tipo_lavado,
-                    precio=vehiculo.precio,
-                    chapa=vehiculo.chapa,
-                    tipo_pago=tipo_pago
-                )
-                db.session.add(nuevo_pago)
-                db.session.commit()
-                flash("Pago realizado correctamente.")
-            else:
-                flash("Vehículo no encontrado.")
-        except Exception as e:
-            db.session.rollback()
-            flash(f"Ocurrió un error al procesar el pago: {e}")
-
-        return redirect(url_for('pagos'))
-
-    # Si es un GET, mostrar la información de pagos y la vista
-    try:
-        pagos_realizados = Pago.query.all()
-        vehiculos = Vehiculo.query.all()
-        print("Vehículos disponibles:", vehiculos)  # Depurar: Imprimir los vehículos
-    except Exception as e:
-        flash(f"No se pudo recuperar los datos: {e}")
-        pagos_realizados = []
-        vehiculos = []
-
-    return render_template('pagos.html', pagos=pagos_realizados, vehiculos=vehiculos)
-
+    <button type="submit" class="btn btn-primary">Realizar Pago</button>
+</form>
 
