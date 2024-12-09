@@ -212,11 +212,16 @@ def admin_pagos():
         flash("No tienes permiso para acceder a esta página.")
         return redirect(url_for('menu'))
     
-    pagos = Vehiculo.query.with_entities(
-        Vehiculo.id, Vehiculo.tipo_lavado, Vehiculo.precio, Vehiculo.chapa
-    ).all()
-    
+    try:
+        pagos = Vehiculo.query.with_entities(
+            Vehiculo.id, Vehiculo.tipo_lavado, Vehiculo.precio, Vehiculo.chapa
+        ).all()
+    except Exception as e:
+        flash(f"Error al recuperar los datos: {e}")
+        pagos = []
+
     return render_template('admin_pagos.html', pagos=pagos)
+
 
 
 @app.route('/admin/reportes', methods=['GET'])
