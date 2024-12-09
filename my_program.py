@@ -205,22 +205,63 @@ def admin_vehiculos():
     vehiculos = Vehiculo.query.all()  # Obtener todos los vehículos registrados
     return render_template('admin_vehiculos.html', vehiculos=vehiculos)
 
-@app.route('/admin/pagos', methods=['GET'])
+@app.route('/admin/pagos', methods=['GET', 'POST'])
 @login_requerido
 def admin_pagos():
     if not is_admin(session['usuario_id']):
         flash("No tienes permiso para acceder a esta página.")
         return redirect(url_for('menu'))
-    
+
+    if request.method == 'POST':
+        # Procesar el formulario de pago
+        vehiculo_id = request.form.get('vehiculo')
+        tipo_pago = request.form.get('tipo_pago')
+
+        if not vehiculo_id or not tipo_pago:
+            flash("Por favor, selecciona un vehículo y un tipo de pago.")
+            return redirect(url_for('admin_pagos'))
+
+        try:
+            # Obtener datos del vehículo
+            vehiculo = Vehiculo.query.get(vehiculo_id)
+
+            if vehiculo:
+                # Lógica de registro del pago (puedes adaptarla según tu sistema)
+                nuevo_pago = Pago(
+                    vehiculo_id=vehiculo.id,
+                    tipo_lavado=vehiculo.tipo_lavado,
+                    precio=vehiculo.precio,
+                    chapa=vehiculo.chapa,
+                    tipo_pago=tipo_pago
+                )
+                db.session.add(nuevo_pago)
+                db.session.commit()
+                flash("Pago registrado exitosamente.")
+            else:
+                flash("Vehículo no encontrado.")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error al procesar el pago: {e}")
+        return redirect(url_for('admin_pagos'))
+
     try:
-        pagos = Vehiculo.query.with_entities(
-            Vehiculo.id, Vehiculo.tipo_lavado, Vehiculo.precio, Vehiculo.chapa
+        # Consultar los pagos registrados
+        pagos = Pago.query.with_entities(
+            Pago.id, Pago.tipo_lavado, Pago.precio, Pago.chapa
         ).all()
+
+        # Consultar los vehículos disponibles
+        vehiculos = Vehiculo.query.with_entities(
+            Vehiculo.id, Vehiculo.modelo, Vehiculo.chapa, Vehiculo.tipo_lavado, Vehiculo.precio
+        ).all()
+
     except Exception as e:
         flash(f"Error al recuperar los datos: {e}")
         pagos = []
+        vehiculos = []
 
-    return render_template('admin_pagos.html', pagos=pagos)
+    return render_template('admin_pagos.html', pagos=pagos, vehiculos=vehiculos)
+
 
 
 
