@@ -38,10 +38,6 @@
             background-color: #0056b3; /* Color al pasar el mouse */
             border-color: #0056b3; /* Color del borde al pasar el mouse */
         }
-        .form-control:focus {
-            border-color: #0984e3; /* Color del borde al enfocar */
-            box-shadow: 0 0 5px rgba(9, 132, 227, 0.5); /* Sombra al enfocar */
-        }
     </style>
 </head>
 <body>
@@ -49,7 +45,8 @@
         <h1 class="text-center">Pagos</h1>
         <p class="text-center">Selecciona un vehículo para realizar el pago.</p>
         
-        <form action="{{ url_for('pagos') }}" method="POST">
+        <form action="{{ url_for('procesar_pago') }}" method="POST">
+            <!-- Selección del vehículo dinámicamente desde Flask -->
             <div class="mb-3">
                 <label for="vehiculo_id" class="form-label">Selecciona un vehículo:</label>
                 <select name="vehiculo_id" class="form-select" required>
@@ -60,6 +57,7 @@
                 </select>
             </div>
 
+            <!-- Selección del tipo de pago -->
             <div class="mb-3">
                 <label for="tipo_pago" class="form-label">Tipo de pago:</label>
                 <select name="tipo_pago" class="form-select" onchange="togglePaymentFields()" required>
@@ -69,6 +67,7 @@
                 </select>
             </div>
 
+            <!-- Campos dinámicos para tarjeta -->
             <div id="tarjeta-fields" style="display:none;">
                 <div class="mb-3">
                     <label for="numero_tarjeta" class="form-label">Número de tarjeta:</label>
@@ -84,6 +83,7 @@
                 </div>
             </div>
 
+            <!-- Campos dinámicos para transferencia -->
             <div id="transferencia-fields" style="display:none;">
                 <div class="mb-3">
                     <label class="form-label">Número de cuenta:</label>
@@ -105,7 +105,6 @@
         <a href="{{ url_for('menu') }}" class="d-block text-center mt-3">Volver al Menú</a>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function togglePaymentFields() {
             const paymentType = document.querySelector('select[name="tipo_pago"]').value;
