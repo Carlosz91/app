@@ -61,18 +61,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for pago in pagos %}
-                    <tr>
-                        <td>{{ pago.id }}</td>
-                        <td>{{ pago.tipo_lavado }}</td>
-                        <td>${{ pago.precio }}</td>
-                        <td>{{ pago.chapa }}</td>
-                    </tr>
+                    {% if pagos and pagos|length > 0 %}
+                        {% for pago in pagos %}
+                        <tr>
+                            <td>{{ pago.id }}</td>
+                            <td>{{ pago.tipo_lavado }}</td>
+                            <td>${{ pago.precio }}</td>
+                            <td>{{ pago.chapa }}</td>
+                        </tr>
+                        {% endfor %}
                     {% else %}
                     <tr>
                         <td colspan="4" class="text-center">No hay pagos registrados.</td>
                     </tr>
-                    {% endfor %}
+                    {% endif %}
                 </tbody>
             </table>
         </div>
