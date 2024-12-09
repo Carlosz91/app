@@ -28,7 +28,6 @@
             padding: 30px;
             width: 100%;
             max-width: 800px;
-            overflow-x: auto;
         }
 
         h1 {
@@ -48,9 +47,42 @@
 <body>
 
     <div class="container">
-        <h1>Reporte de Pagos</h1>
+        <h1>Realizar Pago</h1>
 
-        <div class="table-responsive">
+        <!-- Formulario para seleccionar vehículo y tipo de pago -->
+        <form action="{{ url_for('procesar_pago') }}" method="POST">
+            <!-- Selección de vehículo -->
+            <div class="mb-3">
+                <label for="vehiculo" class="form-label">Selecciona un vehículo:</label>
+                <select class="form-select" id="vehiculo" name="vehiculo" required>
+                    {% if vehiculos and vehiculos|length > 0 %}
+                        {% for vehiculo in vehiculos %}
+                        <option value="{{ vehiculo.id }}">
+                            {{ vehiculo.modelo }} - {{ vehiculo.chapa }} ({{ vehiculo.tipo_lavado }}) - ${{ vehiculo.precio }}
+                        </option>
+                        {% endfor %}
+                    {% else %}
+                    <option disabled>No hay vehículos disponibles.</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <!-- Tipo de pago -->
+            <div class="mb-3">
+                <label for="tipo_pago" class="form-label">Tipo de pago:</label>
+                <select class="form-select" id="tipo_pago" name="tipo_pago" required>
+                    <option value="efectivo">Efectivo</option>
+                    <option value="tarjeta">Tarjeta</option>
+                </select>
+            </div>
+
+            <!-- Botón para realizar el pago -->
+            <button type="submit" class="btn btn-primary w-100">Realizar Pago</button>
+        </form>
+
+        <!-- Tabla de pagos -->
+        <div class="table-responsive mt-4">
+            <h2 class="text-center">Reporte de Pagos</h2>
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -79,7 +111,8 @@
             </table>
         </div>
 
-        <a href="{{ url_for('menu') }}" class="btn btn-primary btn-back">Volver al Menú</a>
+        <!-- Botón para volver al menú -->
+        <a href="{{ url_for('menu') }}" class="btn btn-secondary btn-back">Volver al Menú</a>
     </div>
 
     <!-- Bootstrap JS y dependencias -->
