@@ -36,6 +36,16 @@ class Vehiculo(db.Model):
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     usuario = db.relationship('Usuario', backref=db.backref('vehiculos', lazy=True))
 
+# Modelo para Pagos
+class Pago(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    vehiculo_id = db.Column(db.Integer, db.ForeignKey('vehiculo.id'), nullable=False)
+    tipo_lavado = db.Column(db.String(50), nullable=False)
+    precio = db.Column(db.Integer, nullable=False)
+    chapa = db.Column(db.String(10), nullable=False)
+    tipo_pago = db.Column(db.String(50), nullable=False)
+
+
 # Función para hashear contraseñas
 def hashear_contrasena(contrasena):
     return hashlib.sha256(contrasena.encode()).hexdigest()
