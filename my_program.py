@@ -177,32 +177,26 @@ def finalizar_vehiculo(id):
     
     return redirect(url_for('estado_lavado'))
     
+# Ruta para los pagos
 @app.route('/pagos', methods=['GET', 'POST'])
 def pagos():
-    # Asumimos que el usuario está autenticado y su ID está en la sesión
-    usuario_id = session.get('usuario_id')  # Obtener el ID del usuario desde la sesión
+    # Verifica que el usuario esté autenticado
+    usuario_id = session.get('usuario_id')
     if not usuario_id:
-        return redirect(url_for('login'))  # Redirige a login si no hay usuario autenticado
+        return redirect(url_for('login'))  # Si no está autenticado, redirige al login
 
-    usuario = Usuario.query.get(usuario_id)  # Obtener el objeto Usuario
-    if not usuario:
-        return redirect(url_for('login'))  # Si el usuario no existe, redirige a login
-
-    # Obtener los vehículos del usuario
+    # Obtener los vehículos asociados al usuario autenticado
     vehiculos = Vehiculo.query.filter_by(usuario_id=usuario_id).all()
 
+    # Si el formulario es enviado
     if request.method == 'POST':
-        # Lógica para procesar el pago, por ejemplo:
         vehiculo_id = request.form['vehiculo_id']
         tipo_pago = request.form['tipo_pago']
-        # Aquí deberías añadir la lógica para procesar el pago
+        # Aquí puedes agregar la lógica para procesar el pago (tarjeta, transferencia)
+        return redirect(url_for('confirmacion_pago'))  # Redirige a una página de confirmación de pago
 
-        # Redirigir después de realizar el pago (a la página de confirmación, etc.)
-        return redirect(url_for('confirmacion_pago'))
-
-    # Renderiza el formulario con los vehículos del usuario
-    return render_template('pagos.html', vehiculos=vehiculos, usuario=usuario)
-
+    # Renderizar la plantilla con los vehículos del usuario
+    return render_template('pagos.html', vehiculos=vehiculos)
 
 @app.route('/olvide_contrasena', methods=['GET', 'POST'])
 def olvide_contrasena():
