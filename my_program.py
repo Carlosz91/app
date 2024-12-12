@@ -179,9 +179,29 @@ def finalizar_vehiculo(id):
     
 @app.route('/pagos', methods=['GET', 'POST'])
 def pagos():
-    # Aquí obtienes los vehículos de tu base de datos, por ejemplo:
-    vehiculos = db.session.query(Vehiculo).all()  # Asumiendo que estás usando SQLAlchemy
-    return render_template('pagos.html', vehiculo=vehiculos)
+    # Asumimos que el usuario está autenticado y su ID está en la sesión
+    usuario_id = session.get('usuario_id')  # Obtener el ID del usuario desde la sesión
+    if not usuario_id:
+        return redirect(url_for('login'))  # Redirige a login si no hay usuario autenticado
+
+    usuario = Usuario.query.get(usuario_id)  # Obtener el objeto Usuario
+    if not usuario:
+        return redirect(url_for('login'))  # Si el usuario no existe, redirige a login
+
+    # Obtener los vehículos del usuario
+    vehiculos = Vehiculo.query.filter_by(usuario_id=usuario_id).all()
+
+    if request.method == 'POST':
+        # Lógica para procesar el pago, por ejemplo:
+        vehiculo_id = request.form['vehiculo_id']
+        tipo_pago = request.form['tipo_pago']
+        # Aquí deberías añadir la lógica para procesar el pago
+
+        # Redirigir después de realizar el pago (a la página de confirmación, etc.)
+        return redirect(url_for('confirmacion_pago'))
+
+    # Renderiza el formulario con los vehículos del usuario
+    return render_template('pagos.html', vehiculos=vehiculos, usuario=usuario)
 
 
 @app.route('/olvide_contrasena', methods=['GET', 'POST'])
