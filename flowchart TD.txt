@@ -1,0 +1,128 @@
+flowchart TD
+    A["Navegador (Frontend)"] -->|Solicitudes HTTP| B["Aplicación Flask (Backend)"]
+    B --> C["Base de Datos (PostgreSQL)"]
+    B --> D["Rutas y Controladores"]
+    B --> E["Modelos (SQLAlchemy)"]
+    B --> F["Base de Datos (Usuarios, Vehículos, Pagos)"]
+
+
+
+flowchart TD;
+    A[Ingreso de credenciales] --> B{¿Usuario y contraseña correctos?}
+    B -->|Sí| C[Acceso permitido]
+    B -->|No| D[Error: Usuario o contraseña incorrectos]
+    C --> E[Redirigir a menú]
+    D --> E
+
+
+flowchart TD;
+    A[Ingresar datos del vehículo] --> B{¿Tipo de lavado válido?}
+    B -->|Sí| C[Registrar vehículo]
+    B -->|No| D[Error: Tipo de lavado no válido]
+    C --> E[Vehículo registrado con éxito]
+    D --> E
+
+
+flowchart TD;
+    A[Administrador o Usuario propietario accede a la opción de finalizar] --> B{¿Es el propietario o admin?}
+    B -->|Sí| C[Finalizar vehículo]
+    B -->|No| D[Error: Sin permiso para finalizar]
+    C --> E[Vehículo marcado como finalizado]
+    D --> E
+
+
+flowchart TD;
+    A[Crear entorno virtual] --> B[Instalar dependencias]
+    B --> C[Configurar base de datos PostgreSQL]
+    C --> D[Configurar Flask con URI de la base de datos]
+    D --> E[Configurar la clave secreta de Flask]
+    E --> F[Instalar Gunicorn]
+    F --> G[Crear un archivo Procfile]
+    G --> H[Subir a Heroku]
+    H --> I[Realizar migraciones de base de datos]
+    I --> J[Abrir la aplicación en el navegador]
+
+
+
+graph TD;
+    A[Navegador Frontend] -->|Solicitudes HTTP| B[Aplicación Flask Backend]
+    B --> C[Base de Datos PostgreSQL]
+    B --> D[Rutas y Controladores]
+    B --> E[Modelos SQLAlchemy]
+    B --> F[Base de Datos Usuarios Vehículos Pagos]
+
+
+
+
+
+
+
+
+
+erDiagram
+    USUARIO {
+        int id PK
+        string nombre
+        string password
+        string correo
+        string ciudad
+        boolean es_admin
+    }
+    VEHICULO {
+        int id PK
+        string modelo
+        string chapa
+        string tipo_lavado
+        string estado
+        int precio
+        datetime hora
+        datetime hora_finalizacion
+        int usuario_id FK
+    }
+    PAGO {
+        int id PK
+        int vehiculo_id FK
+        string tipo_lavado
+        int precio
+        string chapa
+        string tipo_pago
+    }
+
+    USUARIO ||--o| VEHICULO : "Tiene"
+    VEHICULO ||--o| PAGO : "Genera"
+
+
+
+graph LR;
+    A[Usuario Interactúa con la Aplicación] --> B[Navegador (Frontend)]
+    B --> C[Envío de Solicitudes HTTP (GET, POST)]
+    C --> D[Aplicación Flask (Backend)]
+    D --> E[Base de Datos PostgreSQL]
+    D --> F[Procesamiento de Lógica (Rutas, Controladores)]
+    F --> G[Modelos de Datos (SQLAlchemy)]
+    G --> E
+    G --> H[Generación de Respuestas (HTML, JSON)]
+    H --> B
+    B --> I[Usuario Recibe Respuesta]
+    I --> J[Interacción con la Aplicación (Ver Menú, Registrar Vehículo, etc.)]
+    J --> B
+
+
+
+graph LR;
+    A[Usuario Interactúa con la Aplicación] --> B[Navegador (Frontend)]
+    B --> C[Envío de Solicitudes HTTP (GET, POST)]
+    C --> D[Aplicación Flask (Backend)]
+    D --> E[Base de Datos PostgreSQL]
+    D --> F[Procesamiento de Lógica (Rutas, Controladores)]
+    F --> G[Modelos de Datos (SQLAlchemy)]
+    G --> E
+    G --> H[Generación de Respuestas (HTML, JSON)]
+    H --> B
+    B --> I[Usuario Recibe Respuesta]
+    I --> J[Interacción con la Aplicación (Ver Menú, Registrar Vehículo, etc.)]
+    J --> B
+
+
+
+
